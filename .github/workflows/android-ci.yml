@@ -1,60 +1,59 @@
-# Name of the workflow as it appears in the GitHub Actions UI
 name: Android CI
 
-# Triggers for the workflow
 on:
-  push: # Trigger on push events
+  push:
     branches:
-      - main # Only run this workflow for changes pushed to the 'main' branch
-  pull_request: # Trigger on pull request events
+      - main
+  pull_request:
     branches:
-      - main # Only run this workflow for pull requests targeting the 'main' branch
+      - main
 
-# Define the jobs that this workflow will perform
 jobs:
-  build: # Name of the job
-    runs-on: ubuntu-latest # Use the latest Ubuntu runner for the job environment
+  build:
+    runs-on: ubuntu-latest
 
-    steps: # Steps to execute within the job
+    steps:
       # Step 1: Check out the repository code
       - name: Checkout code
-        uses: actions/checkout@v3 # GitHub Action to pull the repository code into the runner
+        uses: actions/checkout@v3
 
       # Step 2: Set up JDK for the build
       - name: Set up JDK
-        uses: actions/setup-java@v3 # GitHub Action to configure Java
+        uses: actions/setup-java@v3
         with:
-          java-version: 17 # Specify the Java version to use
-          distribution: 'zulu' # Specify the JDK distribution
+          java-version: 17
+          distribution: 'zulu'
 
       # Step 3: Cache Gradle dependencies to speed up builds
       - name: Cache Gradle dependencies
-        uses: actions/cache@v3 # GitHub Action to cache files
+        uses: actions/cache@v3
         with:
-          path: ~/.gradle/caches # Cache location for Gradle dependencies
+          path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          # Key for cache uniqueness based on Gradle files
           restore-keys: |
-            ${{ runner.os }}-gradle # Fallback cache key if an exact match is not found
+            ${{ runner.os }}-gradle
 
-      # Step 4: Build the Android project using Gradle
+      # Step 4: Make Gradle wrapper executable (Permission fix)
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      # Step 5: Build the Android project using Gradle
       - name: Build with Gradle
-        run: ./gradlew build # Run the Gradle build command
+        run: ./gradlew build
 
-      # Step 5: Run unit tests
+      # Step 6: Run unit tests
       - name: Run unit tests
-        run: ./gradlew test # Execute unit tests defined in the project
+        run: ./gradlew test
 
-      # Step 6: Run UI tests on connected devices/emulators
+      # Step 7: Run UI tests on connected devices/emulators
       - name: Run UI tests
-        run: ./gradlew connectedAndroidTest # Execute UI tests
+        run: ./gradlew connectedAndroidTest
         env:
           ANDROID_SDK_ROOT: ${{ runner.tool_cache }}/android-sdk
-          # Set up the environment variable for Android SDK
 
-      # Step 7: (Optional) Upload build artifacts for debugging or sharing
+      # Step 8: (Optional) Upload build artifacts for debugging or sharing
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3 # GitHub Action to upload files
+        uses: actions/upload-artifact@v3
         with:
-          name: build-output # Name for the uploaded artifact
-          path: app/build/outputs/ # Path to the build outputs to be uploaded
+          name: build-output
+          path: app/build/outputs/
