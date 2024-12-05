@@ -21,7 +21,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'temurin'  # Updated to use temurin
+          distribution: 'temurin'
+
+      # Fix permissions for Gradle wrapper
+      - name: Fix file permissions for gradlew
+        run: chmod +x ./gradlew  # Makes gradlew executable
 
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
