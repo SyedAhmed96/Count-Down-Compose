@@ -46,6 +46,6 @@ class CountDownTimerTest {
         val result = countDownTimer.countDown(0).toList()
 
         // Then: Verifying that the emitted sequence is [0]
-        assertEquals(listOf(1), result)
+        assertEquals(listOf(2), result)
     }
 }
