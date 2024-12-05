@@ -13,18 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK
+      # Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'zulu'
 
-      # Step 3: Cache Gradle dependencies
+      # Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -33,37 +33,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # Step 4: Make Gradle wrapper executable
+      # Make Gradle wrapper executable
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Step 5: Set up Android SDK and install necessary dependencies
-      - name: Set up Android SDK
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30 # Use the API level you need
-          target: google_apis # Emulator with Google APIs
-          force-avd-creation: true
-          arch: x86_64 # 64-bit architecture
-          script: ./gradlew connectedAndroidTest # Command to run the tests
+      # Start Android Emulator
+      - name: Start Android Emulator
+        run: |
+          nohup $ANDROID_HOME/emulator/emulator -avd my_avd -no-window -no-boot-anim &
+          adb wait-for-device
+          adb shell input keyevent 82  # Unlock the emulator screen
 
-      # Step 6: Build the Android project with Gradle
+      # Run Gradle build with stacktrace
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace --info
 
-      # Step 7: Run unit tests
-      - name: Run unit tests
-        run: ./gradlew test
-
-      # Step 8: Run UI tests (connected Android tests)
+      # Run UI tests with stacktrace
       - name: Run UI tests
-        run: ./gradlew connectedAndroidTest
-        env:
-          ANDROID_SDK_ROOT: ${{ runner.tool_cache }}/android-sdk
+        run: ./gradlew connectedAndroidTest --stacktrace
 
-      # Step 9: Upload build artifacts (Optional)
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-output
-          path: app/build/outputs/
+      # Stop Android Emulator
+      - name: Stop Android Emulator
+        run: adb -e emu kill
