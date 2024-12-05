@@ -2,7 +2,7 @@ package com.ahmed.countdowncompose
 
 // import androidx.activity.enableEdgeToEdge
 
-
+import com.google.accompanist.flowlayout.FlowRow
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,64 +90,74 @@ fun CountDownTimerScreen(viewModel: CountDownViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp), // Adds padding around the content
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally, // Centers content horizontally
         verticalArrangement = Arrangement.Center // Centers content vertically
     ) {
-
         // Displays the current timer value
         Text(
-            text = "$timerValue", // Shows the current countdown value
-            style = MaterialTheme.typography.displayMedium, // Applies a large text style
-            modifier = Modifier.testTag("timerValueText") // Test tag for timer value TextView
+            text = "$timerValue",
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier.testTag("timerValueText")
         )
 
-        Spacer(modifier = Modifier.height(16.dp)) // Adds vertical spacing
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // Row for action buttons
-        Row {
+        // FlowRow for 2x2 button layout
+        FlowRow(
+            mainAxisSpacing = 8.dp, // Spacing between buttons horizontally
+            crossAxisSpacing = 16.dp, // Spacing between rows
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(), // Ensures the row wraps properly
+            mainAxisAlignment = FlowMainAxisAlignment.Center // Centers buttons horizontally
+        ) {
             // Start button
             Button(
-                onClick = { viewModel.startTimer(10) }, // Starts the timer from 10 seconds
-                enabled = !isRunning, // Button is disabled if the timer is running
-                modifier = Modifier.testTag("startButton") // Test tag for start button
+                onClick = { viewModel.startTimer(10) },
+                enabled = !isRunning,
+                modifier = Modifier
+                    .width(120.dp) // Ensures uniform button width
+                    .testTag("startButton")
             ) {
                 Text(text = "Start")
             }
 
-            Spacer(modifier = Modifier.width(8.dp)) // Adds horizontal spacing
-
             // Pause button
             Button(
-                onClick = { viewModel.pauseTimer() }, // Pauses the timer
-                enabled = isRunning, // Button is enabled only if the timer is running
-                modifier = Modifier.testTag("pauseButton") // Test tag for pause button
+                onClick = { viewModel.pauseTimer() },
+                enabled = isRunning,
+                modifier = Modifier
+                    .width(120.dp) // Ensures uniform button width
+                    .testTag("pauseButton")
             ) {
                 Text(text = "Pause")
             }
-
-            Spacer(modifier = Modifier.width(8.dp)) // Adds horizontal spacing
 
             // Resume button
             Button(
                 onClick = { viewModel.startTimer(timerValue) },
                 enabled = !isRunning,
-                modifier = Modifier.testTag("resumeButton") // Test tag for resume button
+                modifier = Modifier
+                    .width(120.dp) // Ensures uniform button width
+                    .testTag("resumeButton")
             ) {
                 Text(text = "Resume")
             }
 
-            Spacer(modifier = Modifier.width(8.dp)) // Adds horizontal spacing
-
             // Reset button
             Button(
-                onClick = { viewModel.resetTimer() }, // Resets the timer to its initial state
-                modifier = Modifier.testTag("resetButton") // Test tag for reset button
+                onClick = { viewModel.resetTimer() },
+                modifier = Modifier
+                    .width(120.dp) // Ensures uniform button width
+                    .testTag("resetButton")
             ) {
                 Text(text = "Reset")
             }
         }
     }
+
+
 }
 
 

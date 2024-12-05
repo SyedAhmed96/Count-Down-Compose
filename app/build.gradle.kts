@@ -67,6 +67,9 @@ dependencies {
     // Lifecycle & ViewModel support for Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 
+    // Flow row // for dynamic size row
+    implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
+
     // Debugging tools
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
