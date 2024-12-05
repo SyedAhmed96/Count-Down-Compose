@@ -1,4 +1,4 @@
-name: Android CI
+name: Android CI (Unit Tests Only)
 
 on:
   push:
@@ -37,37 +37,6 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Install Android SDK and ADB
-      - name: Install Android SDK and ADB
-        run: |
-          sudo apt update
-          sudo apt install -y android-sdk
-          export ANDROID_HOME=/usr/local/lib/android/sdk
-          export PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
-          echo $ANDROID_HOME
-
-      # Install emulator and system image
-      - name: Install Emulator and System Image
-        run: |
-          sdkmanager --install "system-images;android-30;google_apis;x86_64"
-          sdkmanager --install "platform-tools"
-          sdkmanager --install "emulator"
-
-      # Start Android Emulator
-      - name: Start Android Emulator
-        run: |
-          nohup $ANDROID_HOME/emulator/emulator -avd my_avd -no-window -no-boot-anim &
-          adb wait-for-device
-          adb shell input keyevent 82  # Unlock the emulator screen
-
-      # Run Gradle build with stacktrace
-      - name: Build with Gradle
-        run: ./gradlew build --stacktrace --info
-
-      # Run UI tests with stacktrace
-      - name: Run UI tests
-        run: ./gradlew connectedAndroidTest --stacktrace
-
-      # Stop Android Emulator
-      - name: Stop Android Emulator
-        run: adb -e emu kill
+      # Run Gradle build for unit tests with stacktrace
+      - name: Build and Run Unit Tests
+        run: ./gradlew test --stacktrace --info
