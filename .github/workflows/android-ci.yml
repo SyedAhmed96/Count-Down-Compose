@@ -13,18 +13,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK for the build
+      # Step 2: Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: 'zulu'
 
-      # Step 3: Cache Gradle dependencies to speed up builds
+      # Step 3: Cache Gradle dependencies
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -33,27 +33,38 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle
 
-      # Step 4: Make Gradle wrapper executable (Permission fix)
+      # Step 4: Make Gradle wrapper executable
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Step 5: Build the Android project using Gradle
+      # Step 5: Set up Android SDK and install necessary dependencies
+      - name: Set up Android SDK
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30 # Use the API level you need
+          target: google_apis # Emulator with Google APIs
+          force-avd-creation: true
+          arch: x86_64 # 64-bit architecture
+          script: ./gradlew connectedAndroidTest # Command to run the tests
+
+      # Step 6: Build the Android project with Gradle
       - name: Build with Gradle
         run: ./gradlew build
 
-      # Step 6: Run unit tests
+      # Step 7: Run unit tests
       - name: Run unit tests
         run: ./gradlew test
 
-      # Step 7: Run UI tests on connected devices/emulators
+      # Step 8: Run UI tests (connected Android tests)
       - name: Run UI tests
         run: ./gradlew connectedAndroidTest
         env:
           ANDROID_SDK_ROOT: ${{ runner.tool_cache }}/android-sdk
 
-      # Step 8: (Optional) Upload build artifacts for debugging or sharing
+      # Step 9: Upload build artifacts (Optional)
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build-output
           path: app/build/outputs/
+clear
